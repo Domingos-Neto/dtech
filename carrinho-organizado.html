@@ -96,9 +96,8 @@
       text-decoration: none;
       line-height: 1.5;
     }
-
-</style>
 </head>
+</style>
 <body>
    <h1>Seu Carrinho</h1>
 
@@ -116,7 +115,42 @@
   </table>
 
   <h3>Total: <span id="total-carrinho">R$ 0,00</span></h3>
+  
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+      const tbody = document.querySelector("#carrinho-tbody");
+      let total = 0;
 
+      // Para evitar repetir produtos iguais (acumular quantidade)
+      const produtosAgrupados = {};
+
+      carrinho.forEach(item => {
+        if (produtosAgrupados[item.nome]) {
+          produtosAgrupados[item.nome].quantidade += item.quantidade;
+        } else {
+          produtosAgrupados[item.nome] = { ...item }; // copia o item
+        }
+      });
+
+      for (const nome in produtosAgrupados) {
+        const item = produtosAgrupados[nome];
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${item.nome}</td>
+          <td>R$ ${item.preco.toFixed(2).replace(".", ",")}</td>
+          <td>${item.quantidade}</td>
+        `;
+        tbody.appendChild(tr);
+
+        total += item.preco * item.quantidade;
+      }
+
+      const totalElemento = document.querySelector("#total-carrinho");
+      totalElemento.innerText = `R$ ${total.toFixed(2).replace(".", ",")}`;
+    });
+  </script>
   
   <div style="display: flex; justify-content: center; gap: 20px; margin-top: 30px;">
     <div class="limpar">
@@ -185,40 +219,5 @@
     }
 
     renderCarrinho();
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
-      const tbody = document.querySelector("#carrinho-tbody");
-      let total = 0;
-
-      // Para evitar repetir produtos iguais (acumular quantidade)
-      const produtosAgrupados = {};
-
-      carrinho.forEach(item => {
-        if (produtosAgrupados[item.nome]) {
-          produtosAgrupados[item.nome].quantidade += item.quantidade;
-        } else {
-          produtosAgrupados[item.nome] = { ...item }; // copia o item
-        }
-      });
-
-      for (const nome in produtosAgrupados) {
-        const item = produtosAgrupados[nome];
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-          <td>${item.nome}</td>
-          <td>R$ ${item.preco.toFixed(2).replace(".", ",")}</td>
-          <td>${item.quantidade}</td>
-        `;
-        tbody.appendChild(tr);
-
-        total += item.preco * item.quantidade;
-      }
-
-      const totalElemento = document.querySelector("#total-carrinho");
-      totalElemento.innerText = `R$ ${total.toFixed(2).replace(".", ",")}`;
-    });
-  </script>
-</body>
+  </body>
 </html>
